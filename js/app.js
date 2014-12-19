@@ -28,7 +28,7 @@ $(function() {
 			var shader = THREE.ShaderLib[ "cube" ];
 			shader.uniforms[ "tCube" ].texture = cubemap;
 
-			var reflectionMaterial = new THREE.MeshLambertMaterial({
+			var reflectionMaterial = new THREE.MeshPhongMaterial({
 				color: 0xcccccc,
 				envMap: cubemap,
 				reflectivity: 0.7
