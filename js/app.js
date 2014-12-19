@@ -1,5 +1,5 @@
 $(function() {
-	var w = 1024, h = 768;
+	var w = 1024, h = 1024;
 	var renderer = new THREE.WebGLRenderer();
 	var camera = new THREE.PerspectiveCamera( 45, w / h, 0.1, 10000 );
 	var scene = new THREE.Scene();
@@ -13,8 +13,33 @@ $(function() {
 	$('body').append(renderer.domElement);
 
 
-	var dod = new THREE.Mesh( new THREE.DodecahedronGeometry(50), new THREE.MeshPhongMaterial({color: 0x666666}) );
-	scene.add(dod);
+	var dod;
+
+	html2canvas(document.body.children[0], {
+		onrendered: function(canvas) {
+			var url = canvas.toDataURL("image/png");
+			var urls = [url, url, url, url, url, url];
+
+			// wrap it up into the object that we need
+			var cubemap = THREE.ImageUtils.loadTextureCube(urls);
+
+			cubemap.format = THREE.RGBFormat;
+
+			var shader = THREE.ShaderLib[ "cube" ];
+			shader.uniforms[ "tCube" ].texture = cubemap;
+
+			var reflectionMaterial = new THREE.MeshLambertMaterial({
+				color: 0xcccccc,
+				envMap: cubemap,
+				reflectivity: 0.7
+			});
+
+
+			dod = new THREE.Mesh( new THREE.DodecahedronGeometry(100), reflectionMaterial );
+			scene.add(dod);
+		}
+	});
+
 
 
 	var pointLight = new THREE.PointLight(0xFF0000);
@@ -31,13 +56,14 @@ $(function() {
 
 
 	function draw(t) {
-		pointLight.position.set(100 * Math.sin(t / 1000), 50, 100 * Math.cos(t / 1000) );
-		pointLight2.position.set(100 * Math.sin(3.1 + t / 1000), 50, 100 * Math.cos(3.1 +  t / 1000) );
+		pointLight.position.set(300 * Math.sin(t / 3000), 50, 300 * Math.cos(t / 3000) );
+		pointLight2.position.set(300 * Math.sin(3.1 + t / 3000), 50, 300 * Math.cos(3.1 +  t / 3000) );
 
-		pointLight3.position.set(100 * Math.sin(-t / 1000), -50, 100 * Math.cos(-t / 1000) );
-		pointLight4.position.set(100 * Math.sin(3.1 + -t / 1000), -50, 100 * Math.cos(3.1 +  -t / 1000) );
+		pointLight3.position.set(300 * Math.sin(-t / 3000), -50, 300 * Math.cos(-t / 3000) );
+		pointLight4.position.set(300 * Math.sin(3.1 + -t / 3000), -50, 300 * Math.cos(3.1 +  -t / 3000) );
 
-		dod.rotateX(.01);
+		dod && dod.rotateX(.001);
+		dod && dod.rotateY(.0023);
 		renderer.render(scene, camera);
 	}
 
